@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zaki Pom</title>
+</head>
+<style>
+    body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        h1 {
+            font-size: 50px;
+            color: rgb(20, 75, 57);
+            font-family: cursive;
+        }
+        .button {
+            padding: 30px;
+            background-color: #56d0e0;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 56px;
+            text-decoration: none;
+            margin: 10px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .medium-button {
+            padding: 15px 25px; /* Ukuran sedang */
+            font-size: 30px; /* Ukuran font lebih kecil */
+            background-color: #56d0e0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            margin-top: 10px;
+        }
+        .medium-button:hover {
+            background-color: #45a049;
+        }
+        .input-container {
+            margin-top: 20px;
+        }
+        h2 {
+            color: #ca1616;
+        }
+        input[type="text"] {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #41d9cd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .pom-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pom {
+            background-color: white;
+            border: 1px solid #1A237E;
+            border-radius: 10px;
+            width: 60px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+            font-size: 14px;
+            color: #0c4497;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pom:hover {
+            background-color: #36a33c;
+        }
+        .clicked {
+            background-color: #6e1616be !important;
+            color: rgb(255, 255, 255);
+            transition: background-color 0.3s ease;
+        }
+        .disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.5; /* Visually indicate it's disabled */
+        }
+        .category-container {
+            display: block;
+        }       
+</style>
+<body>
+    <h1>Zaki Pom</h1>
+    <div class="category-container" id="categoryPage">
+        <button class="button" onclick="navigateTo()">Pertamax</button>
+        <button class="button" onclick="navigateTo()">Pertalite</button>
+        <button class="button" onclick="navigateTo()">Dexlite</button>
+    </div>
+
+    <div class="input-container" style="display:none;" id="inputPage">
+        <p>MASUKKAN JUMLAH NOMINAL DIBAWAH</p>
+        <h2>SESUAI YANG ISI DOMPET</h2>
+        <input type="text" id="nominal" name="nominal" placeholder="Masukkan jumlah nominal DI SINI" oninput="formatCurrency(this)">
+        <br>
+        <button class="medium-button" onclick="submitNominal()">Enter</button>
+        <button class="medium-button" onclick="goBack()">Kembali</button>
+    </div>
+
+    <div class="pom-container" style="display:none;" id="pomPage">
+        <div class="header">Pilih Pom</div>
+        <div class="pom-container">
+            <div class="pom" onclick="handleClick(this)">POM 1</div>
+            <div class="pom" onclick="handleClick(this)">POM 2</div>
+            <div class="pom" onclick="handleClick(this)">POM 3</div>
+            <div class="pom" onclick="handleClick(this)">POM 4</div>
+        </div>
+    </div>
+
+    <script>
+        let pomDisableTimers = {}; 
+
+        function navigateTo() {
+            document.getElementById('categoryPage').style.display = 'none'; 
+            document.getElementById('inputPage').style.display = 'block'; 
+        }
+
+        function formatCurrency(input) {
+            let value = input.value.replace(/[^0-9]/g, '');
+            if (value) {
+                input.value = 'Rp ' + parseFloat(value).toLocaleString('id-ID');
+            } else {
+                input.value = '';
+            }
+        }
+
+        function submitNominal() {
+            const nominalValue = document.getElementById('nominal').value;
+            if (nominalValue) {
+                alert("Apakah bener nominalnya segini? " + nominalValue);
+                document.getElementById('inputPage').style.display = 'none'; 
+                document.getElementById('pomPage').style.display = 'block'; 
+            } else {
+                alert("Silakan masukkan jumlah nominal.");
+            }
+        }
+
+        function goBack() {
+            document.getElementById('inputPage').style.display = 'none'; 
+            document.getElementById('categoryPage').style.display = 'block'; 
+        }
+
+        function handleClick(element) {
+            const pomId = element.innerText; 
+            const currentTime = new Date().getTime();
+            const disableDuration = 20000; 
+
+            
+            if (pomDisableTimers[pomId] && currentTime < pomDisableTimers[pomId]) {
+                alert("Anda harus menunggu.POM INI SEDANG DI PAKAI.");
+                return;
+            }
+
+            element.classList.add('clicked'); 
+            const poms = document.querySelectorAll('.pom');
+            
+            poms.forEach(pom => {
+                if (pom !== element) {
+                    pom.classList.remove('disabled'); 
+                }
+            });
+
+            
+            pomDisableTimers[pomId] = currentTime + disableDuration;
+
+            
+            element.classList.add('disabled');
+
+            setTimeout(() => {
+                element.classList.remove('disabled'); 
+                element.classList.remove('clicked'); 
+            }, disableDuration);
+
+            
+            setTimeout(function() {
+                alert("Kembali ke halaman pertama.");
+                document.getElementById('pomPage').style.display = 'none'; 
+                document.getElementById('categoryPage').style.display = 'block'; 
+            }, 500); 
+        }
+    </script>
+</body>
+</html>
